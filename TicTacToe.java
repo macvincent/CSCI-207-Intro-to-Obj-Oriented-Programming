@@ -1,5 +1,5 @@
 import java.util.Scanner;
-class TicTacToe {
+class Main {
   static Scanner input = new Scanner(System.in);
   static String [][]arr = new String[3][3];
   static boolean gameEnd = false;
@@ -76,7 +76,12 @@ class TicTacToe {
 
   static boolean check(String a){
     if(a == "-") return true;
-    System.out.println("\nTaken. Select a different placement");
+    if(isFull()){
+      System.out.println("Array is full. Here this is a new one");
+      create();
+      display(arr);
+    }
+    System.out.println("Select a different placement");
     return false;
   }
 
@@ -113,5 +118,16 @@ class TicTacToe {
           displayWinner("Two");
         }
     }
+  }
+  static boolean isFull(){
+    boolean full = true;
+    for(int i = 0; i<3; i++){
+      for(int j = 0; j < 3; j++){
+        if(arr[i][j] == "-"){
+          full = false;
+        }
+      }
+    }
+    return full;
   }
 }
