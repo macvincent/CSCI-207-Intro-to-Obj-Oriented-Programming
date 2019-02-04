@@ -1,9 +1,9 @@
 import java.util.Scanner;
-class Main {
+class Main{
   static Scanner input = new Scanner(System.in);
   static String [][]arr = new String[3][3];
   static boolean gameEnd = false;
-
+//Creates an empty board
   static void create(){
     for(int i = 0; i<3; i++){
      for(int j = 0; j<3; j++){
@@ -13,20 +13,19 @@ class Main {
   }
 
   public static void main(String[] args) {
+//we create the initial board
    create();
    while(!gameEnd){
-    playerOne();
-    checkGameEnd("One");
-    if(gameEnd){
-      break;
-    }
+    play("One","X");
+    checkGameEnd("One","X");
+    if(gameEnd)break;
     System.out.println();
-    playerTwo();
-    checkGameEnd("Two");
+    play("Two","O");
+    checkGameEnd("Two","O");
     System.out.println();
    }
   }
-
+//This method when called displays the board
   public static void display(String[][]arr){
     System.out.println("____________\n");
     for(int i = 0; i<3; i++){
@@ -36,9 +35,9 @@ class Main {
      System.out.println("\n____________\n");
    }
   }
-
-  static void playerOne(){
-    System.out.println("Player One");
+//Here a player selects a position to play
+  static void play(String player, String key){
+    System.out.println("Player "+player);
     display(arr);
     boolean insert = true;
     while(insert){
@@ -46,79 +45,56 @@ class Main {
       int i = input.nextInt();
       System.out.print("Which Column: ");
       int j = input.nextInt();
+      if(i > 2  || i < 0 || j > 2 || j < 0){
+        System.out.println("You entered an invalid position. Try again!");
+        continue;
+      }
       if(check(arr[i][j])){
-        arr[i][j] = "X";
+        arr[i][j] = key;
         insert = false;
       }
     }
   }
-
-  static void playerTwo(){
-    System.out.println("Player Two");
-    display(arr);
-    boolean insert = true;
-    while(insert){
-      System.out.print("Which Row: ");
-      int i = input.nextInt();
-      System.out.print("Which Column: ");
-      int j = input.nextInt();
-      if(check(arr[i][j])){
-        arr[i][j] = "O";
-        insert = false;
-      }
-    }
-  }
-
-  static void displayWinner(String a){
-    System.out.println("Player "+ a +" is the winner!");
+//This is a method that displays the winner
+  static void displayWinner(String player){
+    System.out.println("\n*********************************");
+    System.out.println("Player "+ player +" is the winner!");
+    System.out.println("*********************************\n");
     gameEnd = true;
   }
-
+//We check to ensure that position is not taken
   static boolean check(String a){
     if(a == "-") return true;
     if(isFull()){
-      System.out.println("Array is full. Here this is a new one");
+      System.out.println("Array is full. Here, this is a new one");
       create();
       display(arr);
     }
-    System.out.println("Select a different placement");
+    else{
+      System.out.println("Taken!\nSelect a different placement\n");
+    }
     return false;
   }
-
-  static void checkGameEnd(String a){
-    if(a == "One"){
+//We check for all possible win positions
+  static void checkGameEnd(String player, String key){
       for(int i = 0; i<3; i++){
-        if(arr[i][0]=="X" && arr[i][1]=="X" && arr[i][2]=="X"){
-          displayWinner("One");
+        if(arr[i][0] == key && arr[i][1] == key && arr[i][2]== key ){
+          displayWinner(player);
+          break;
         }
-        if(arr[0][i]=="X" && arr[1][i]=="X" && arr[2][i]=="X"){
-          displayWinner("One");
+        if(arr[0][i] == key && arr[1][i] == key && arr[2][i] == key){
+          displayWinner(player);
+          break;
         }
       }
-      if(arr[0][0]=="X" && arr[1][1]=="X" && arr[2][2]=="X"){
-          displayWinner("One");
-        }
-        if(arr[0][2]=="X" && arr[1][1]=="X" && arr[2][0]=="X"){
-          displayWinner("One");
-        }
-    }
-    else{
-      for(int i = 0; i<3; i++){
-      if(arr[i][0]=="O" && arr[i][1]=="O" && arr[i][2]=="O"){
-        displayWinner("Two");
+      if(arr[0][0] == key && arr[1][1] == key && arr[2][2] == key){
+          displayWinner(player);
       }
-      if(arr[0][i]=="O" && arr[1][i]=="O" && arr[2][i]=="O"){
-        displayWinner("Two");
+      if(arr[0][2] == key && arr[1][1] == key && arr[2][0] == key){
+          displayWinner(player);
       }
-    }
-    if(arr[0][0]=="O" && arr[1][1]=="O" && arr[2][2]=="O"){
-          displayWinner("Two");
-        }
-        if(arr[0][2]=="O" && arr[1][1]=="O" && arr[2][0]=="O"){
-          displayWinner("Two");
-        }
-    }
   }
+//Checks to see when board is full without winners
   static boolean isFull(){
     boolean full = true;
     for(int i = 0; i<3; i++){
