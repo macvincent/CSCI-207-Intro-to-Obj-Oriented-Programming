@@ -41,10 +41,18 @@ class Main{
     display(arr);
     boolean insert = true;
     while(insert){
-      System.out.print("Which Row: ");
-      int i = input.nextInt();
-      System.out.print("Which Column: ");
-      int j = input.nextInt();
+      int i = 0, j = 0;
+      try{
+        System.out.print("Which Row: ");
+        i = input.nextInt();
+        System.out.print("Which Column: ");
+        j = input.nextInt();
+      }
+      catch(Exception e){
+        System.out.println("Invalid Input! \nTry again");
+        input.nextLine();
+        continue;
+      }
       if(i > 2  || i < 0 || j > 2 || j < 0){
         System.out.println("You entered an invalid position. Try again!");
         continue;
