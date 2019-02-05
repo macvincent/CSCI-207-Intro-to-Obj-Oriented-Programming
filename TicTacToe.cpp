@@ -29,12 +29,25 @@ void play(string player, string key){
   display(arr);
   bool insert = true;
   while(insert){
-    cout<<"Which Row: ";
-    int i;
-    cin>>i;
-    cout<<"Which Column: ";
-    int j;
-    cin>>j;
+    int i = 0, j = 0;
+    try{
+      cout<<"Which Row: ";
+      cin>>i;
+      if(!cin){
+        throw -1;
+      }
+      cout<<"Which Column: ";
+      cin>>j;
+      if(!cin){
+        throw -1;
+      }
+    }
+    catch(...){
+      cin.clear();
+      cin.ignore(1000,'\n');
+      cout<<"Invalid input\nSelect a different placement\n";
+      continue;
+    }
     if(i > 2  || i < 0 || j > 2 || j < 0){
       cout<<"You entered an invalid position. Try again!\n";
       continue;
