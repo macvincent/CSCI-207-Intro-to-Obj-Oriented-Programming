@@ -33,3 +33,9 @@
     qSort(arr,l,ptr-2);
     qSort(arr,ptr,r);
   }
+ /* I considered two options: quicksort and mergesort. I chose quicksort for various reasons:
+1. Time complexity: I made an assumption that the list of numbers would not be already sorted. In that case
+	we are sure of a O(nlogn) for the quicksort, wich is similar to merge sort's O(nlogn).
+2. Space complexity: Merge sort will uses O(n) since it's not a linked list while quick sort only uses O(logn) space.
+ 	And since the size of the list is not specified quicksort is a better bet.
+ */
