@@ -39,3 +39,8 @@
 2. Space complexity: Merge sort will uses O(n) since it's not a linked list while quick sort only uses O(logn) space.
  	And since the size of the list is not specified quicksort is a better bet.
  */
+
+We take this to be a pipline problem. A problem that is explained by the fact the 
+of the 32 quaterbacks teams in the NFL only 9 are black. Most positions in the NFL is based on
+experience. These quater back end up being potential offensive 
+cordinators, who end up being potential quaterback coordinators who end up being head coaches.
