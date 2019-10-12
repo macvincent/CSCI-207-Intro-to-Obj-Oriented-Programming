@@ -1,111 +1,121 @@
 #include <iostream>
 #include <vector>
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
-//We construct a node class
-struct Node{
-  int x;
-  int y;
-  int g;
-  int h;
-  enum class State {Open, Closed};
-  State state;
-
-  Node(int x, int y){
-    this->x = x;
-    this->y = y; 
-    this->g = 0;  
-  }
-  int findH(Node* curr){
-    return abs(curr->x - this->x) +  abs(curr->y - this->y);
-  }
+class AStar{
+    struct Node{
+        int x;
+        int y;
+        int g;
+        int h;
+        enum class State{open, closed, path, checked, endNode};
+        Node* prev;
+        State state;
+        Node(int x, int y){
+            this->x = x;
+            this->y = y;
+            prev = nullptr;
+            this->g = 0;
+            this->h = 0;
+        }
+    };
+    std::vector<std::vector<Node*>> grid;
+    std::vector<Node*> openNodes;
+    Node* beginNode;
+    Node* endNode;
+    void create(std::vector<std::vector<int>>, int, int);
+    void find(Node*);
+    void addNode(Node*&, Node*&);
+public:
+    void search(std::vector<std::vector<int>>& arr, int endx, int endy);
 };
 
-//This creates the grid we would be sorting through
-std::vector<std::vector<Node*>> createGrid(std::vector<std::vector<int>>& arr, Node* endNode){
-  std::vector<std::vector<Node*>> grid;
-  for(int i = 0; i < arr.size(); i++){
-    std::vector<Node*> temp;
-    for(int j = 0; j < arr[i].size(); j++){
-      Node* newNode = new Node(i,j);
-      newNode->h = endNode->findH(newNode);
-      temp.push_back(newNode);
-    }grid.push_back(temp);
-  }
-  return grid;
+int main(){
+    std::vector<std::vector<int>> arr{
+        {0,0,0,1},
+        {0,0,1,0},
+        {0,1,0,0},
+        {0,1,0,1},
+        {0,0,0,0}
+    };
+    AStar* search = new AStar();
+    search->search(arr, 1, 3);
 }
 
-//This function would be used when sorting node values
-bool compare (Node* x, Node* y){
-  return (x->h + x->g) > (y->h + y->g);
-}
-
-/**
-*Initial board input
-*0 represents open spaces and 1 represents blocks
-*/
-std::vector<std::vector<int>> createBoard(){
-    std::vector<std::vector<int>>board{{0,1,0,0,0,0,0,0}, {0,1,0,0,0,0,0,0}, {0,1,0,0,0,0,0,0}, {0,1,0,1,0,0,0,0}, {0,0,0,1,0,0,0,0}};
-    return board;
-}
-
-//Our AStarSearch to find the shortest path through the board
-void AStarSearch(std::vector<std::vector<int>>& arr, std::vector<std::vector<Node*>>& grid){
-  //We initialise our start and end Nodes which can also be gotten from user input
-  Node* startNode = grid[0][0];
-  Node* endNode = grid[arr.size()-1][arr[1].size()-1];
-  std::vector<Node*> open;
-  open.push_back(startNode);
-  Node* cur = startNode;
-
-  //This directions vector makes it easier to search for possible node neighbors
-  int direction [][2] = {{1, 0}, {0, 1}, {-1, 0}, {-1, 0}};
-
-  //We would keep on searching as long as there are still open arrays or we have not yet reached the end node
-  while(open.size() > 0){
-  	//We set current nodes as part of path
-    cur->state = Node::State::Closed;
-    for(auto i : direction){
-      int tempX = cur->x + i[0];
-      int tempY = cur->y + i[1];
-
-      if(tempX < grid.size() && tempY < grid[1].size()){
-        if(arr[tempX][tempY] != 1 && grid[tempX][tempY]-> state !=  Node::State::Closed){
-          grid[tempX][tempY]->g = 1 + cur->g;
-          open.push_back(grid[tempX][tempY]);
+// Creates grid and set their h values
+void AStar::create(std::vector<std::vector<int>> arr, int endx, int endy){
+    if(arr.size() == 0) return;
+    std::vector<Node*>tempList;
+    endNode = new Node(endx, endy);
+    for(int i = 0; i < arr.size(); i++){
+        for(int j = 0; j < arr[i].size(); j++){
+            Node* temp = new Node(i, j);
+            temp->h = abs(endNode->x - i) + abs(endNode->y - j);
+            if(arr[i][j] == 0)temp->state = Node::State::open;
+            else temp->state = Node::State::closed;
+            tempList.push_back(temp);
         }
-      }
+        grid.push_back(tempList);
+        tempList.clear();
     }
-    /**
-    *we sort for the node with the lowest f-value
-    *f = h + g
-    *Where h = heuristic value and g is workdone or steps taken
-    *The f value helps us make the best decision as to which node to move to
-    */
-    std::sort(open.begin(), open.end(), compare);
-    cur = open.back();
-    if(cur == endNode)break;
-    open.pop_back();
-  }
-  	cur->state = Node::State::Closed;//The end node is also part of path
+    delete endNode;
+    endNode = grid[endx][endy];
 }
 
-int main() {
-  std::vector<std::vector<int>>arr = createBoard();
-  Node* endNode = new Node(arr.size()-1, arr[0].size()-1);
-  std::vector<std::vector<Node*>> grid = createGrid(arr, endNode);
-  AStarSearch(arr, grid);
-  delete endNode;
-  //We print the found path
-  for(auto i : grid){
-    for(auto j : i){
-      if(j->state == Node::State::Closed){
-        printf("%2d ", j->g);
-      }else{
-        printf("%d ", -1);
-      }
-    }std::cout << '\n';
-  }
+// Main A-Star pathfinding implementation
+void AStar::search(std::vector<std::vector<int>> &arr, int endx, int endy){
+    create(arr, endx, endy);
+    std::cout << "=>" << endNode->x << ' ' << endNode->y << std::endl;
 
+    grid[0][0]->state = Node::State::checked;
+    openNodes.push_back(grid[0][0]);
+
+    while(openNodes.size()){
+        Node* temp = openNodes[openNodes.size()-1];
+        openNodes.pop_back();
+        if(temp == endNode){
+            std::cout << "Node Found" << std::endl;
+            while(temp){
+                temp->state = Node::State::path;
+                printf("[%d, %d]\n", temp->x, temp->y);
+                temp = temp->prev;
+            }
+            endNode->state = Node::State::endNode;
+            for(auto i : grid){
+                for(auto j : i){
+                    if(j->state == Node::State::path)std::cout << "* ";
+                    else if (j->state == Node::State::checked || j->state == Node::State::open)std::cout << "1 ";
+                    else if (j->state == Node::State::endNode)std::cout << "+ ";
+                    else std::cout << 0 << ' ';
+                }std::cout << std::endl;
+            }
+            return;
+        }
+        find(temp);
+    }
+    std::cout << "No path found" << std::endl;
+}
+
+//Populates and sorts openNodes
+void AStar::find(AStar::Node* temp){
+    if(temp == nullptr) return;
+    int i = temp->x;
+    int j = temp->y;
+    // Check for valid nodes
+    if(i+1 < grid.size() && grid[i+1][j]->state == Node::State::open) addNode(temp, grid[i+1][j]);
+    if(i-1 >= 0 && grid[i-1][j]->state == Node::State::open) addNode(temp, grid[i-1][j]);
+    if(j+1 < grid[i].size() && grid[i][j+1]->state == Node::State::open) addNode(temp, grid[i][j+1]);
+    if(j-1 >= 0 && grid[i][j-1]->state == Node::State::open) addNode(temp, grid[i][j-1]);
+    // Sort nodes according to their g and h values
+    sort(openNodes.begin(), openNodes.end(), [](Node* a, Node* b){
+        return (a->h + a->g) > (b->h + b->g);
+    });
+}
+
+void AStar::addNode(AStar::Node*& curr, AStar::Node*& next){
+    next->g = curr->g + 1;
+    next->prev = curr;
+    next->state = Node::State::checked;
+    openNodes.push_back(next);
 }
